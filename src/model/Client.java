@@ -6,7 +6,7 @@ import java.net.Socket;
 public class Client {
 	private String name;
 	private int id;
-	private InetAddress ipAddress;
+	private InetAddress inetAddress;
 	private AudioThread audioThread;
 	private CommandThread commandThread;
 	private volatile boolean connected;
@@ -25,7 +25,7 @@ public class Client {
 //	}
 	
 	public Client(Socket commandSocket, byte[] buffer) {
-		ipAddress = commandSocket.getInetAddress();
+		inetAddress = commandSocket.getInetAddress();
 		commandThread = new CommandThread(this, commandSocket);
 		commandThread.start();
 //		audioThread = new AudioThread(this, audioSocket);
@@ -43,12 +43,12 @@ public class Client {
 //		connected = true;
 //	}
 
-	public Client(InetAddress ipAddress) {
-		this.ipAddress = ipAddress;
+	public Client(InetAddress inetAddress) {
+		this.inetAddress = inetAddress;
 	}
 
-	public InetAddress getIpAddress() {
-		return ipAddress;
+	public InetAddress getInetAddress() {
+		return inetAddress;
 	}
 
 	public String getName() {
@@ -79,8 +79,8 @@ public class Client {
 		audioThread.setAudioBuffer(buffer);
 	}
 	
-	public void sendAudioBuffer(byte[] buffer) {
-		audioThread.sendAudioBuffer(buffer);
+	public boolean sendAudioBuffer(byte[] buffer) {
+		return audioThread.sendAudioBuffer(buffer);
 	}
 	
 	public void setCommandThreadReceivedListener(CommandReceivedListener listener) {

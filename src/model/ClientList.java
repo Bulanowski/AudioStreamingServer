@@ -3,7 +3,6 @@ package model;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.HashMap;
-import java.util.LinkedList;
 
 public class ClientList {
 
@@ -27,7 +26,10 @@ public class ClientList {
 //				ByteBuffer byteBuffer = ByteBuffer.wrap(buffer);
 //				byteBuffer.put(ev.getBuffer());
 				for (Client client : clients.values()) {
-					client.sendAudioBuffer(ev.getBuffer());
+					boolean userConnected = client.sendAudioBuffer(ev.getBuffer());
+					if (!userConnected) {
+						clients.remove(client.getInetAddress());
+					}
 					client.setNewBuffer(true);
 				}
 			}
@@ -59,7 +61,7 @@ public class ClientList {
 	public void addUser(Socket commandSocket, CommandReceivedListener commandReceivedListener) {
 		Client client = new Client(commandSocket, buffer);
 		client.setCommandThreadReceivedListener(commandReceivedListener);
-		clients.put(client.getIpAddress(), client);
+		clients.put(client.getInetAddress(), client);
 	}
 
 //	public void addUser(Socket commandSocket, Socket audioSocket, CommandReceivedListener listener) {

@@ -31,13 +31,17 @@ public class AudioThread extends Thread {
 	}
 	
 	
-	public void sendAudioBuffer(byte[] buffer) {
+	public boolean sendAudioBuffer(byte[] buffer) {
 		try {
-			outputStream.write(buffer);
+			if (client.isConnected()) {
+				outputStream.write(buffer);
+				return true;
+			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return false;
 	}
 
 	public void run() {

@@ -65,6 +65,10 @@ public class Client {
 		return id;
 	}
 	
+	public boolean isCommandConnected() {
+		return commandThread.getSocket().isConnected();
+	}
+	
 	public boolean isAudioConnected() {
 		return audioThread.getSocket().isConnected();
 	}

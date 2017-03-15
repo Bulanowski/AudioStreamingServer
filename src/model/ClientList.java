@@ -23,6 +23,8 @@ public class ClientList {
 					if (client.isAudioConnected()) {
 						client.sendAudioBuffer(ev.getBuffer());
 //						client.setNewBuffer(true);
+					} else if (client.isCommandConnected()) {
+						// make connection to audio server
 					} else {
 						clients.remove(client.getInetAddress());
 					}

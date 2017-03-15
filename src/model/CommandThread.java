@@ -30,6 +30,10 @@ public class CommandThread extends Thread {
 	public ObjectOutputStream getObjectOutputStream() {
 		return objectOutputStream;
 	}
+	
+	public Socket getSocket() {
+		return socket;
+	}
 
 	public void run() {
 		try {

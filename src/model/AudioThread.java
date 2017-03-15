@@ -32,8 +32,21 @@ public class AudioThread extends Thread {
 //		this.buffer = buffer;
 //	}
 	
-	public Socket getSocket() {
-		return socket;
+//	public Socket getSocket() {
+//		return socket;
+//	}
+	
+	public boolean isConnected() {
+		return socket.isConnected();
+	}
+	
+	public void close() {
+		try {
+			socket.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	public void sendAudioBuffer(byte[] buffer) {

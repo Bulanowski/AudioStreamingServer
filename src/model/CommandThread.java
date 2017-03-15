@@ -31,8 +31,21 @@ public class CommandThread extends Thread {
 		return objectOutputStream;
 	}
 	
-	public Socket getSocket() {
-		return socket;
+//	public Socket getSocket() {
+//		return socket;
+//	}
+	
+	public boolean isConnected() {
+		return socket.isConnected();
+	}
+	
+	public void close() {
+		try {
+			socket.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public void run() {

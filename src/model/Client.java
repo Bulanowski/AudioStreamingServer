@@ -1,6 +1,5 @@
 package model;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 
@@ -67,21 +66,16 @@ public class Client {
 	}
 	
 	public boolean isCommandConnected() {
-		return commandThread.getSocket().isConnected();
+		return commandThread.isConnected();
 	}
 	
 	public boolean isAudioConnected() {
-		return audioThread.getSocket().isConnected();
+		return audioThread.isConnected();
 	}
 	
 	public void disconnect() {
-		try {
-			commandThread.getSocket().close();
-			audioThread.getSocket().close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		commandThread.close();
+		audioThread.close();
 	}
 
 //	public void setConnected(boolean bool) {

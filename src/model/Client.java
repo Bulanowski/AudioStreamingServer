@@ -9,13 +9,10 @@ public class Client {
 	private InetAddress inetAddress;
 	private AudioThread audioThread;
 	private CommandThread commandThread;
-//	private volatile boolean connected;
-//	private volatile boolean newBuffer;
 
 //	public Client(String name, int id) {
 //		this.name = name;
 //		this.id = id;
-//
 //	}
 
 //	public Client(String name, Socket audioSocket) {
@@ -77,26 +74,6 @@ public class Client {
 		commandThread.close();
 		audioThread.close();
 	}
-
-//	public void setConnected(boolean bool) {
-//		connected = bool;
-//	}
-
-//	public boolean isConnected() {
-//		return connected;
-//	}
-
-//	public void setNewBuffer(boolean bool) {
-//		newBuffer = bool;
-//	}
-//	
-//	public boolean getNewBuffer() {
-//		return newBuffer;
-//	}
-	
-//	public void setAudioThreadBuffer(byte[] buffer) {
-//		audioThread.setAudioBuffer(buffer);
-//	}
 	
 	public void sendAudioBuffer(byte[] buffer) {
 		audioThread.sendAudioBuffer(buffer);
@@ -105,14 +82,5 @@ public class Client {
 	public void setCommandThreadReceivedListener(CommandReceivedListener listener) {
 		commandThread.setCommandReceivedListener(listener);
 	}
-	
-	
-//	public void setCommandThreadQueue(SongQueue queue) {
-//		commandThread.setQueue(queue);
-//	}
-//	
-//	public void setCommandThreadManager(MusicLibraryManager manager) {
-//		commandThread.setManager(manager);
-//	}
 
 }

@@ -25,15 +25,15 @@ public class MusicLibraryManager {
 	private String musicLibraryPath = Config.MUSICLIBPATH;
 	private MusicLibrary ml;
 
-	public  ArrayList<Song> listSong() {
+	public ArrayList<Song> listSong() {
 		return ml.getSongList();
 	}
 
-	public  void openMusicLibrary() {
+	public void openMusicLibrary() {
 		ml = getMusicLibrary();
 	}
 
-	public  void addToMusicLibrary(File dir) {
+	public void addToMusicLibrary(File dir) {
 		ArrayList<File> list = getAllFiles(dir);
 		for (File file : list) {
 
@@ -52,7 +52,7 @@ public class MusicLibraryManager {
 
 				} catch (NumberFormatException e) {
 					Scanner s = new Scanner(new File("src/shits_on_fire.yo"));
-					while(s.hasNextLine()) {
+					while (s.hasNextLine()) {
 						System.err.println(s.nextLine());
 					}
 					s.close();
@@ -162,7 +162,5 @@ public class MusicLibraryManager {
 			e.printStackTrace();
 		}
 	}
-	
-	
 
 }

@@ -11,24 +11,13 @@ import model.SongQueue;
 
 public class CommandController implements CommandReceivedListener {
 
-//	private ClientList clients;
 	private MusicLibraryManager manager;
 	private SongQueue queue;
-//	private CommandReceivedListener commandReceivedListener;
-	
-//	public CommandReceivedListener getCommandReceivedListener() {
-//		return commandReceivedListener;
-//	}
 
 	public CommandController(MusicLibraryManager manager, SongQueue queue) {
-//		this.clients = clients;
 		this.manager = manager;
 		this.queue = queue;
 	}
-
-//	public CommandReceivedListener getCommandReceivedListener() {
-//		return commandReceivedListener;
-//	}
 
 	@Override
 	public void commandReceived(CommandReceivedEvent ev) {

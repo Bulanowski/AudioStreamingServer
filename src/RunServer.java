@@ -24,7 +24,6 @@ public class RunServer {
 		CommandReceivedListener listener = new CommandController(manager, songQueue);
 		CommandServer commandServer = new CommandServer(listener);
 		AudioServer audioServer = new AudioServer();
-//		clientList.setSongQueue(songQueue);
 		songQueue.start();
 		songQueue.setAudioBufferListener(clientList.getAudioBufferListener());
 		commandServer.setClientList(clientList);
@@ -32,8 +31,8 @@ public class RunServer {
 		commandServer.start();
 		audioServer.start();
 
-//		TeamspeakQuery query = new TeamspeakQuery();
-//		query.start();
+		// TeamspeakQuery query = new TeamspeakQuery();
+		// query.start();
 
 	}
 

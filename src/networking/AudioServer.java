@@ -33,6 +33,11 @@ public class AudioServer extends Thread {
 
 //				welcomeSocket.close();
 			} catch (Exception e) {
+				try {
+					audioServer.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
 				e.printStackTrace();
 			}
 

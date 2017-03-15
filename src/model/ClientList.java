@@ -6,18 +6,12 @@ import java.util.HashMap;
 
 public class ClientList {
 
-	// TODO: Change to HashMap of INetAddress and Client
 	private HashMap<InetAddress, Client> clients;
-//	private LinkedList<Client> clients;
 	private AudioPacketListener audioBufferListener;
 	private byte[] buffer;
-//	private MusicLibraryManager manager;
-//	private SongQueue queue;
 
 	public ClientList(MusicLibraryManager manager) {
 		buffer = new byte[20];
-//		this.manager = manager;
-//		clients = new LinkedList<>();
 		clients = new HashMap<>();
 		audioBufferListener = new AudioPacketListener() {
 
@@ -26,11 +20,12 @@ public class ClientList {
 //				ByteBuffer byteBuffer = ByteBuffer.wrap(buffer);
 //				byteBuffer.put(ev.getBuffer());
 				for (Client client : clients.values()) {
-					boolean userConnected = client.sendAudioBuffer(ev.getBuffer());
-					if (!userConnected) {
+					if (client.isAudioConnected()) {
+						client.sendAudioBuffer(ev.getBuffer());
+//						client.setNewBuffer(true);
+					} else {
 						clients.remove(client.getInetAddress());
 					}
-					client.setNewBuffer(true);
 				}
 			}
 		};
@@ -45,18 +40,8 @@ public class ClientList {
 	}
 	
 	public Client getByInetAddress(InetAddress inetAddress) {
-//		clients.get(inetAddress);
-//		for (Client client : clients) {
-//			if (client.getIpAddress().equals(inetAddress)) {
-//				return client;
-//			}
-//		}
 		return clients.get(inetAddress);
 	}
-
-//	public void setSongQueue(SongQueue queue) {
-//		this.queue = queue;
-//	}
 	
 	public void addUser(Socket commandSocket, CommandReceivedListener commandReceivedListener) {
 		Client client = new Client(commandSocket, buffer);

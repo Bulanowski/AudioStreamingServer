@@ -9,8 +9,8 @@ public class Client {
 	private InetAddress inetAddress;
 	private AudioThread audioThread;
 	private CommandThread commandThread;
-	private volatile boolean connected;
-	private volatile boolean newBuffer;
+//	private volatile boolean connected;
+//	private volatile boolean newBuffer;
 
 //	public Client(String name, int id) {
 //		this.name = name;
@@ -26,12 +26,12 @@ public class Client {
 	
 	public Client(Socket commandSocket, byte[] buffer) {
 		inetAddress = commandSocket.getInetAddress();
-		commandThread = new CommandThread(this, commandSocket);
+		commandThread = new CommandThread(commandSocket);
 		commandThread.start();
 //		audioThread = new AudioThread(this, audioSocket);
 //		audioThread.setAudioBuffer(buffer);
 //		audioThread.start();
-		connected = true;
+//		connected = true;
 	}
 	
 //	public Client(Socket commandSocket, Socket audioSocket, byte[] buffer) {
@@ -46,6 +46,12 @@ public class Client {
 	public Client(InetAddress inetAddress) {
 		this.inetAddress = inetAddress;
 	}
+	
+	public void startAudioThread(Socket audioSocket, byte[] buffer) {
+		audioThread = new AudioThread(audioSocket);
+//		audioThread.setAudioBuffer(buffer);
+		audioThread.start();
+	}
 
 	public InetAddress getInetAddress() {
 		return inetAddress;
@@ -58,39 +64,37 @@ public class Client {
 	public int getId() {
 		return id;
 	}
-
-	public void setConnected(boolean bool) {
-		connected = bool;
-	}
-
-	public boolean isConnected() {
-		return connected;
+	
+	public boolean isAudioConnected() {
+		return audioThread.getSocket().isConnected();
 	}
 
-	public void setNewBuffer(boolean bool) {
-		newBuffer = bool;
-	}
+//	public void setConnected(boolean bool) {
+//		connected = bool;
+//	}
+
+//	public boolean isConnected() {
+//		return connected;
+//	}
+
+//	public void setNewBuffer(boolean bool) {
+//		newBuffer = bool;
+//	}
+//	
+//	public boolean getNewBuffer() {
+//		return newBuffer;
+//	}
 	
-	public boolean getNewBuffer() {
-		return newBuffer;
-	}
+//	public void setAudioThreadBuffer(byte[] buffer) {
+//		audioThread.setAudioBuffer(buffer);
+//	}
 	
-	public void setAudioThreadBuffer(byte[] buffer) {
-		audioThread.setAudioBuffer(buffer);
-	}
-	
-	public boolean sendAudioBuffer(byte[] buffer) {
-		return audioThread.sendAudioBuffer(buffer);
+	public void sendAudioBuffer(byte[] buffer) {
+		audioThread.sendAudioBuffer(buffer);
 	}
 	
 	public void setCommandThreadReceivedListener(CommandReceivedListener listener) {
 		commandThread.setCommandReceivedListener(listener);
-	}
-	
-	public void startAudioThread(Socket audioSocket, byte[] buffer) {
-		audioThread = new AudioThread(this, audioSocket);
-		audioThread.setAudioBuffer(buffer);
-		audioThread.start();
 	}
 	
 	

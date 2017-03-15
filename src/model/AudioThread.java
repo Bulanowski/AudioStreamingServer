@@ -2,16 +2,14 @@ package model;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
 
 public class AudioThread extends Thread {
-	private Client client;
-	private InetAddress address;
+//	private Client client;
+//	private InetAddress address;
 	private Socket socket;
-	private byte[] buffer;
-	private int id = -1;
+//	private byte[] buffer;
+//	private int id = -1;
 	private OutputStream outputStream;
 
 //	public AudioThread(Client client, InetAddress address) {
@@ -20,28 +18,31 @@ public class AudioThread extends Thread {
 //
 //	}
 	
-	public AudioThread(Client client, Socket socket) {
-		this.client = client;
+//	public AudioThread(Client client, Socket socket) {
+//		this.client = client;
+//		this.socket = socket;
+//		id = socket.getPort();
+//	}
+	
+	public AudioThread(Socket socket) {
 		this.socket = socket;
-		id = socket.getPort();
 	}
 
-	public void setAudioBuffer(byte[] buffer) {
-		this.buffer = buffer;
+//	public void setAudioBuffer(byte[] buffer) {
+//		this.buffer = buffer;
+//	}
+	
+	public Socket getSocket() {
+		return socket;
 	}
 	
-	
-	public boolean sendAudioBuffer(byte[] buffer) {
+	public void sendAudioBuffer(byte[] buffer) {
 		try {
-			if (client.isConnected()) {
-				outputStream.write(buffer);
-				return true;
-			}
+			outputStream.write(buffer);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return false;
 	}
 
 	public void run() {
@@ -52,12 +53,12 @@ public class AudioThread extends Thread {
 			outputStream = socket.getOutputStream();
 			
 			
-			while (client.isConnected()) {
-				if (client.getNewBuffer()) {
-//					outputStream.write(buffer);
-					client.setNewBuffer(false);
-				}
-			}
+//			while (socket.isConnected()) {
+//				if (client.getNewBuffer()) {
+////					outputStream.write(buffer);
+//					client.setNewBuffer(false);
+//				}
+//			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

@@ -3,7 +3,6 @@ package controller;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
-import model.ClientList;
 import model.CommandReceivedEvent;
 import model.CommandReceivedListener;
 import model.CommandThread;

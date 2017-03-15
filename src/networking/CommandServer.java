@@ -44,6 +44,11 @@ public class CommandServer extends Thread {
 
 //				welcomeSocket.close();
 			} catch (Exception e) {
+				try {
+					commandServer.close();
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
 				e.printStackTrace();
 			}
 

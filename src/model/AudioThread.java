@@ -52,7 +52,6 @@ public class AudioThread extends Thread {
 //			id = socket.getPort();
 			outputStream = socket.getOutputStream();
 			
-			
 //			while (socket.isConnected()) {
 //				if (client.getNewBuffer()) {
 ////					outputStream.write(buffer);

@@ -40,7 +40,7 @@ public class CommandThread extends Thread {
 			objectInputStream = new ObjectInputStream(socket.getInputStream());
 			objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
 
-			while (true) {
+			while (socket.isConnected()) {
 
 				String inputCommand = objectInputStream.readUTF();
 				System.out.println(inputCommand);

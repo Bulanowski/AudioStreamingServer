@@ -26,6 +26,7 @@ public class ClientList {
 					} else if (client.isCommandConnected()) {
 						// make connection to audio server
 					} else {
+						client.disconnect();
 						clients.remove(client.getInetAddress());
 					}
 				}

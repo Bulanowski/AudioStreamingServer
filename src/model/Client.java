@@ -9,39 +9,11 @@ public class Client {
 	private InetAddress inetAddress;
 	private AudioThread audioThread;
 	private CommandThread commandThread;
-
-//	public Client(String name, int id) {
-//		this.name = name;
-//		this.id = id;
-//	}
-
-//	public Client(String name, Socket audioSocket) {
-//		audioThread = new AudioThread(this, audioSocket);
-//		audioThread.start();
-//		connected = true;
-//	}
 	
 	public Client(Socket commandSocket, byte[] buffer) {
 		inetAddress = commandSocket.getInetAddress();
 		commandThread = new CommandThread(commandSocket);
 		commandThread.start();
-//		audioThread = new AudioThread(this, audioSocket);
-//		audioThread.setAudioBuffer(buffer);
-//		audioThread.start();
-//		connected = true;
-	}
-	
-//	public Client(Socket commandSocket, Socket audioSocket, byte[] buffer) {
-//		commandThread = new CommandThread(this, commandSocket);
-//		commandThread.start();
-//		audioThread = new AudioThread(this, audioSocket);
-//		audioThread.setAudioBuffer(buffer);
-//		audioThread.start();
-//		connected = true;
-//	}
-
-	public Client(InetAddress inetAddress) {
-		this.inetAddress = inetAddress;
 	}
 	
 	public void startAudioThread(Socket audioSocket, byte[] buffer) {

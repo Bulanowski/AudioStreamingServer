@@ -7,17 +7,23 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class AudioThread extends Thread {
-	private User user;
+	private Client client;
 	private InetAddress address;
-	private Socket audioSocket;
+	private Socket socket;
 	private byte[] buffer;
 	private int id = -1;
 	private OutputStream outputStream;
 
-	public AudioThread(User user, InetAddress address) {
-		this.user = user;
-		this.address = address;
-
+//	public AudioThread(Client client, InetAddress address) {
+//		this.client = client;
+//		this.address = address;
+//
+//	}
+	
+	public AudioThread(Client client, Socket socket) {
+		this.client = client;
+		this.socket = socket;
+		id = socket.getPort();
 	}
 
 	public void setAudioBuffer(byte[] buffer) {
@@ -36,16 +42,16 @@ public class AudioThread extends Thread {
 
 	public void run() {
 		try {
-			ServerSocket serverSocket = new ServerSocket(8796);
-			audioSocket = serverSocket.accept();
-			id = audioSocket.getPort();
-			outputStream = audioSocket.getOutputStream();
+//			ServerSocket serverSocket = new ServerSocket(8796);
+//			socket = serverSocket.accept();
+//			id = socket.getPort();
+			outputStream = socket.getOutputStream();
 			
 			
-			while (user.isConnected()) {
-				if (user.getNewBuffer()) {
+			while (client.isConnected()) {
+				if (client.getNewBuffer()) {
 //					outputStream.write(buffer);
-					user.setNewBuffer(false);
+					client.setNewBuffer(false);
 				}
 			}
 		} catch (IOException e) {

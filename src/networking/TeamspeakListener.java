@@ -7,19 +7,19 @@ import com.github.theholywaffle.teamspeak3.api.event.ClientJoinEvent;
 import com.github.theholywaffle.teamspeak3.api.event.ClientLeaveEvent;
 import com.github.theholywaffle.teamspeak3.api.event.TS3EventAdapter;
 
-import model.User;
+import model.Client;
 
 public class TeamspeakListener extends TS3EventAdapter {
-	ArrayList<User> users;
+	ArrayList<Client> users;
 	int queryClientId;
 	
-	public  TeamspeakListener(ArrayList<User> users, int queryClientId ) {
+	public  TeamspeakListener(ArrayList<Client> users, int queryClientId ) {
 		this.users = new ArrayList<>();
 		this.queryClientId = queryClientId;
 	}
 	
 	
-	public ArrayList<User> getUsers() {
+	public ArrayList<Client> getUsers() {
 		return users;
 	}
 
@@ -28,7 +28,7 @@ public class TeamspeakListener extends TS3EventAdapter {
 		if (e.getInvokerId() != queryClientId) {
 			System.out.print(e.getClientNickname()+" joined on ");
 			System.out.println(new Date());
-			users.add(new User(e.getClientNickname(), e.getClientId()));
+//			users.add(new Client(e.getClientNickname(), e.getClientId()));
 		}
 	}
 	

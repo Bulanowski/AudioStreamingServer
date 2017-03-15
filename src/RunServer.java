@@ -1,8 +1,16 @@
 
 import model.MusicLibraryManager;
 import model.SongQueue;
-import model.UserList;
-import networking.TCPServer;
+
+import java.io.ObjectOutputStream;
+
+import controller.CommandController;
+import model.ClientList;
+import model.CommandReceivedEvent;
+import model.CommandReceivedListener;
+import model.CommandThread;
+import networking.AudioServer;
+import networking.CommandServer;
 
 public class RunServer {
 
@@ -16,14 +24,18 @@ public class RunServer {
 			}
 		}
 
-		TCPServer server = new TCPServer(manager);
-		UserList userList = new UserList(manager);
+		ClientList clientList = new ClientList(manager);
 		SongQueue songQueue = new SongQueue();
-		userList.setSongQueue(songQueue);
+		CommandReceivedListener listener = new CommandController(manager, songQueue);
+		CommandServer commandServer = new CommandServer(listener);
+		AudioServer audioServer = new AudioServer();
+//		clientList.setSongQueue(songQueue);
 		songQueue.start();
-		songQueue.setAudioBufferListener(userList.getAudioBufferListener());
-		server.setUserList(userList);
-		server.start();
+		songQueue.setAudioBufferListener(clientList.getAudioBufferListener());
+		commandServer.setClientList(clientList);
+		audioServer.setClientList(clientList);
+		commandServer.start();
+		audioServer.start();
 
 //		TeamspeakQuery query = new TeamspeakQuery();
 //		query.start();

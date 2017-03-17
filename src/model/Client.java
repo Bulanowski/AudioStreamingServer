@@ -1,5 +1,6 @@
 package model;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.Socket;
 
@@ -49,6 +50,10 @@ public class Client {
 	
 	public void sendAudioBuffer(byte[] buffer) {
 		audioThread.sendAudioBuffer(buffer);
+	}
+	
+	public void sendSongFile(File songFile) {
+		audioThread.sendSongFile(songFile);
 	}
 	
 	public void setCommandThreadReceivedListener(CommandReceivedListener listener) {

@@ -25,7 +25,7 @@ public class RunServer {
 		CommandServer commandServer = new CommandServer(listener);
 		AudioServer audioServer = new AudioServer();
 		songQueue.start();
-		songQueue.setAudioBufferListener(clientList.getAudioBufferListener());
+		songQueue.setSendFileListener(clientList.getSendFileListener());
 		commandServer.setClientList(clientList);
 		audioServer.setClientList(clientList);
 		commandServer.start();

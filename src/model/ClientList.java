@@ -1,5 +1,6 @@
 package model;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.HashMap;
@@ -7,21 +8,22 @@ import java.util.HashMap;
 public class ClientList {
 
 	private HashMap<InetAddress, Client> clients;
-	private AudioPacketListener audioBufferListener;
+	private SendFileListener sendFileListener;
 	private byte[] buffer;
 
 	public ClientList(MusicLibraryManager manager) {
 		buffer = new byte[20];
 		clients = new HashMap<>();
-		audioBufferListener = new AudioPacketListener() {
+		sendFileListener = new SendFileListener() {
 
 			@Override
-			public void audioBufferFilled(AudioPacketEvent ev) {
+			public void fileReady(SendFileEvent ev) {
 				// ByteBuffer byteBuffer = ByteBuffer.wrap(buffer);
 				// byteBuffer.put(ev.getBuffer());
+				System.out.println();
 				for (Client client : clients.values()) {
 					if (client.isAudioConnected()) {
-						client.sendAudioBuffer(ev.getBuffer());
+						client.sendSongFile(new File(ev.getFilePath()));
 						// client.setNewBuffer(true);
 					} else if (client.isCommandConnected()) {
 						// make connection to audio server
@@ -34,8 +36,8 @@ public class ClientList {
 		};
 	}
 
-	public AudioPacketListener getAudioBufferListener() {
-		return audioBufferListener;
+	public SendFileListener getSendFileListener() {
+		return sendFileListener;
 	}
 
 	public byte[] getBuffer() {

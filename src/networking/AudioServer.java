@@ -22,21 +22,22 @@ public class AudioServer extends Thread {
 			e1.printStackTrace();
 		}
 
-		while (true) {
+		while (!this.isInterrupted()) {
 			try {
 				Socket audioSocket = audioServer.accept();
 				System.out.println("Audio Server connected to " + audioSocket.getInetAddress());
 				clientList.getByInetAddress(audioSocket.getInetAddress()).startAudioThread(audioSocket, clientList.getBuffer());
 			} catch (Exception e) {
-				try {
-					audioServer.close();
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
+//				try {
+//					audioServer.close();
+//				} catch (IOException e1) {
+//					e1.printStackTrace();
+//				}
 				e.printStackTrace();
 			}
 
 		}
+		
 
 	}
 }

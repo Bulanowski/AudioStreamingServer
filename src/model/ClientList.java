@@ -39,6 +39,21 @@ public class ClientList {
 			}
 		}
 	}
+	
+	public void startPlaying() {
+		for (Client c : clients.values()) {
+			c.startPlaying();
+		}
+	}
+	
+	public boolean isPlaying() {
+		for (Client c : clients.values()) {
+			if (c.getPlaying()) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 	public Collection<Client> clients() {
 		return clients.values();

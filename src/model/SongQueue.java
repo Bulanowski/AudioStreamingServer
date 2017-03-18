@@ -4,22 +4,14 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class SongQueue implements Runnable {
 	private Thread thread;
-	private final ConcurrentLinkedQueue<String> songPaths;
 	private SendFileListener sendFileListener;
-	private final AudioBroadcasterStateChangedListener audioBroadcasterStateChangedListener;
-	private boolean broadcasting = false;
+	private final ClientList clientList;
+	private final ConcurrentLinkedQueue<String> songPaths;
 	private volatile int size = 0;
 
-	public SongQueue() {
+	public SongQueue(ClientList clientList) {
+		this.clientList = clientList;
 		songPaths = new ConcurrentLinkedQueue<>();
-		audioBroadcasterStateChangedListener = new AudioBroadcasterStateChangedListener() {
-
-			@Override
-			public void changedState(AudioBroadcasterStateChangedEvent ev) {
-				broadcasting = ev.getState();
-			}
-			
-		};
 	}
 
 	public synchronized void addSong(String song) {
@@ -30,10 +22,6 @@ public class SongQueue implements Runnable {
 
 	public void setSendFileListener(SendFileListener sendFileListner) {
 		this.sendFileListener = sendFileListner;
-	}
-	
-	public AudioBroadcasterStateChangedListener getAudioBroadcasterStateChangedListener() {
-		return audioBroadcasterStateChangedListener;
 	}
 
 	public void start() {
@@ -51,7 +39,7 @@ public class SongQueue implements Runnable {
 	@Override
 	public void run() {
 		while (thread != null) {
-			if (!broadcasting && size > 0) {
+			if (!clientList.isPlaying() && size > 0) {
 				size--;
 				String songPath = songPaths.poll();
 				SendFileEvent ev = new SendFileEvent(this, songPath);

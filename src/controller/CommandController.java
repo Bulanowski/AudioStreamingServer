@@ -57,6 +57,12 @@ public class CommandController implements CommandReceivedListener {
 			// outToClient.writeObject(msg);
 			// }
 			break;
+		case "song_end":
+			if (ev.getSource() instanceof Client) {
+				Client c = (Client) ev.getSource();
+				c.stopPlaying();
+			}
+			break;
 		case "end_connection":
 			if (ev.getSource() instanceof Client) {
 				Client c = (Client) ev.getSource();

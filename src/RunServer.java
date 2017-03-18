@@ -20,7 +20,7 @@ public class RunServer {
 		}
 
 		ClientList clientList = new ClientList();
-		SongQueue songQueue = new SongQueue();
+		SongQueue songQueue = new SongQueue(clientList);
 		CommandReceivedListener commandReceivedListener = new CommandController(manager, songQueue);
 		// CommandServer commandServer = new CommandServer(listener);
 		// AudioServer audioServer = new AudioServer();
@@ -29,7 +29,6 @@ public class RunServer {
 		AudioBroadcaster audioBroadcaster = new AudioBroadcaster(clientList);
 		audioBroadcaster.start();
 		songQueue.setSendFileListener(audioBroadcaster.getSendFileListener());
-		audioBroadcaster.setAudioBroadcasterStateChangedListener(songQueue.getAudioBroadcasterStateChangedListener());
 		TCPServer tcpServer = new TCPServer(53308, clientList, commandReceivedListener);
 		tcpServer.start();
 		// commandServer.setClientList(clientList);

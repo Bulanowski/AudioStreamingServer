@@ -5,8 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import model.AudioBroadcasterStateChangedEvent;
-import model.AudioBroadcasterStateChangedListener;
 import model.ClientList;
 import model.PackageType;
 import model.SendFileEvent;
@@ -17,7 +15,6 @@ public class AudioBroadcaster implements Runnable {
 	private Thread thread;
 	private final ClientList clientList;
 	private final SendFileListener sendFileListener;
-	private AudioBroadcasterStateChangedListener audioBroadcasterStateChangedListener;
 	private volatile File songFile;
 	private final int PACKET_SIZE = 10;
 
@@ -29,6 +26,7 @@ public class AudioBroadcaster implements Runnable {
 			public void fileReady(SendFileEvent ev) {
 				if (songFile == null) {
 					songFile = new File(ev.getFilePath());
+					clientList.startPlaying();
 				} else {
 					System.out.println("Tried to change songFile in AudioBroadcaster from " + songFile.getAbsolutePath() + " to " + new File(ev.getFilePath()));
 				}
@@ -48,10 +46,6 @@ public class AudioBroadcaster implements Runnable {
 		return sendFileListener;
 	}
 	
-	public void setAudioBroadcasterStateChangedListener(AudioBroadcasterStateChangedListener audioBroadcasterStateChangedListener) {
-		this.audioBroadcasterStateChangedListener = audioBroadcasterStateChangedListener;
-	}
-	
 	public boolean isBroadcasting() {
 		return (songFile != null);
 	}
@@ -65,10 +59,6 @@ public class AudioBroadcaster implements Runnable {
 		while (thread != null) {
 			if (songFile != null) {
 				try {
-					AudioBroadcasterStateChangedEvent ev = new AudioBroadcasterStateChangedEvent(this, true);
-					if (audioBroadcasterStateChangedListener != null) {
-						audioBroadcasterStateChangedListener.changedState(ev);
-					}
 					FileInputStream fileInStream = new FileInputStream(songFile);
 					Integer size = fileInStream.available();
 //					byte[] number = new byte[4];
@@ -88,10 +78,6 @@ public class AudioBroadcaster implements Runnable {
 					e.printStackTrace();
 				} finally {
 					songFile = null;
-					AudioBroadcasterStateChangedEvent ev = new AudioBroadcasterStateChangedEvent(this, false);
-					if (audioBroadcasterStateChangedListener != null) {
-						audioBroadcasterStateChangedListener.changedState(ev);
-					}
 				}
 			} else {
 				try {

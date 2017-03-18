@@ -32,6 +32,18 @@ public class Client implements Runnable {
 			thread.start();
 		}
 	}
+	
+	public boolean getPlaying() {
+		return playing;
+	}
+	
+	public void startPlaying() {
+		playing = true;
+	}
+	
+	public void stopPlaying() {
+		playing = false;
+	}
 
 	// TODO: Read input from Client
 	// Each client will have their own thread that handles commands received

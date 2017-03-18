@@ -1,65 +1,66 @@
 package model;
 
-import java.io.File;
+import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.Collection;
 import java.util.HashMap;
 
 public class ClientList {
 
 	private HashMap<InetAddress, Client> clients;
-	private SendFileListener sendFileListener;
-	private byte[] buffer;
 
-	public ClientList(MusicLibraryManager manager) {
-		buffer = new byte[20];
+	public ClientList() {
 		clients = new HashMap<>();
-		sendFileListener = new SendFileListener() {
+	}
+	
+//	public void sendAllCatchAll(byte packageType, Object information) {
+//		System.out.println("Sending data to connected clients: " + information);
+//		for (Client c : clients.values()) {
+//			if (c.isConnected()) {
+//				System.out.println(
+//						"Sending to client " + c.getInetAddress().getHostAddress() + " at time " + System.nanoTime());
+//				c.sendCatchAll(packageType, information);;
+//			} else {
+//				c.stop();
+//				clients.remove(c.getInetAddress());
+//			}
+//		}
+//	}
 
-			@Override
-			public void fileReady(SendFileEvent ev) {
-				// ByteBuffer byteBuffer = ByteBuffer.wrap(buffer);
-				// byteBuffer.put(ev.getBuffer());
-				System.out.println();
-				for (Client client : clients.values()) {
-					if (client.isAudioConnected()) {
-						client.sendSongFile(new File(ev.getFilePath()));
-						// client.setNewBuffer(true);
-					} else if (client.isCommandConnected()) {
-						// make connection to audio server
-					} else {
-						client.disconnect();
-						clients.remove(client.getInetAddress());
-					}
-				}
+	// GET RID OF THESE THROWS
+	public void sendAll(byte packageType, Object obj) throws IOException {
+		for (Client c : clients.values()) {
+			if (c.isConnected()) {
+				c.send(packageType, obj);
+			} else {
+				c.stop();
+				clients.remove(c.getInetAddress());
 			}
-		};
+		}
 	}
 
-	public SendFileListener getSendFileListener() {
-		return sendFileListener;
+	public Collection<Client> clients() {
+		return clients.values();
 	}
 
-	public byte[] getBuffer() {
-		return buffer;
+	public Client remove(InetAddress inetAddress) {
+		return clients.remove(inetAddress);
 	}
 
 	public Client getByInetAddress(InetAddress inetAddress) {
 		return clients.get(inetAddress);
 	}
 
-	public void addUser(Socket commandSocket, CommandReceivedListener commandReceivedListener) {
-		Client client = new Client(commandSocket, buffer);
-		client.setCommandThreadReceivedListener(commandReceivedListener);
-		clients.put(client.getInetAddress(), client);
+	public void addClient(Socket clientSocket, CommandReceivedListener commandReceivedListener) {
+		try {
+			Client client = new Client(clientSocket, commandReceivedListener);
+//			client.setCommandReceivedListener(commandReceivedListener);
+			client.start();
+			clients.put(client.getInetAddress(), client);
+		} catch (IOException e) {
+			System.err.println("Failed to add new Client");
+			e.printStackTrace();
+		}
 	}
-
-	// public void addUser(Socket commandSocket, Socket audioSocket,
-	// CommandReceivedListener listener) {
-	// Client client = new Client(commandSocket, audioSocket, buffer);
-	// client.setCommandThreadReceivedListener(listener);
-	//// client.setCommandThreadManager(manager);
-	//// client.setCommandThreadQueue(queue);
-	// clients.add(client);
-	// }
 }

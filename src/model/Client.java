@@ -1,30 +1,98 @@
 package model;
 
-import java.io.File;
+import java.io.EOFException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 
-public class Client {
-	private String name;
-	private int id;
-	private InetAddress inetAddress;
-	private AudioThread audioThread;
-	private CommandThread commandThread;
-	
-	public Client(Socket commandSocket, byte[] buffer) {
-		inetAddress = commandSocket.getInetAddress();
-		commandThread = new CommandThread(commandSocket);
-		commandThread.start();
+public class Client implements Runnable {
+	private Thread thread;
+	private final Socket socket;
+	private final ObjectOutputStream output;
+	private final ObjectInputStream input;
+	private final CommandReceivedListener commandReceivedListener;
+	private final String name;
+	private final int id;
+	private volatile boolean playing = false;
+
+	public Client(Socket socket, CommandReceivedListener commandReceivedListener) throws IOException {
+		this.socket = socket;
+		this.commandReceivedListener = commandReceivedListener;
+		output = new ObjectOutputStream(socket.getOutputStream());
+		input = new ObjectInputStream(socket.getInputStream());
+		name = socket.getInetAddress().getHostAddress();
+		id = socket.getPort();
 	}
-	
-	public void startAudioThread(Socket audioSocket, byte[] buffer) {
-		audioThread = new AudioThread(audioSocket);
-//		audioThread.setAudioBuffer(buffer);
-		audioThread.start();
+
+	public void start() {
+		if (thread == null) {
+			thread = new Thread(this);
+			thread.start();
+		}
+	}
+
+	// TODO: Read input from Client
+	// Each client will have their own thread that handles commands received
+	// from the client
+	// This thread will also be responsible for sending data back to the client
+	// that the client requests
+	@Override
+	public void run() {
+		while (socket.isConnected()) {
+			try {
+				String inFromClient = input.readUTF();
+				CommandReceivedEvent ev = new CommandReceivedEvent(this, inFromClient);
+				if (commandReceivedListener != null) {
+					commandReceivedListener.commandReceived(ev);
+				}
+			} catch (EOFException e) {
+				try {
+					socket.close();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+
+	public void stop() {
+		try {
+			System.out.println("Closing connection with " + socket.getInetAddress().getHostAddress());
+			if (socket != null) {
+				socket.close();
+			}
+			thread = null;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public synchronized void send(byte packageType, Object obj) throws IOException {
+		output.writeByte(packageType);
+		output.writeObject(obj);
+	}
+
+//	public void setCommandReceivedListener(CommandReceivedListener commandReceivedListener) {
+//		this.commandReceivedListener = commandReceivedListener;
+//	}
+
+	public boolean isConnected() {
+		return socket.isConnected();
 	}
 
 	public InetAddress getInetAddress() {
-		return inetAddress;
+		return socket.getInetAddress();
 	}
 
 	public String getName() {
@@ -33,31 +101,6 @@ public class Client {
 
 	public int getId() {
 		return id;
-	}
-	
-	public boolean isCommandConnected() {
-		return commandThread.isConnected();
-	}
-	
-	public boolean isAudioConnected() {
-		return audioThread.isConnected();
-	}
-	
-	public void disconnect() {
-		commandThread.close();
-		audioThread.close();
-	}
-	
-	public void sendAudioBuffer(byte[] buffer) {
-		audioThread.sendAudioBuffer(buffer);
-	}
-	
-	public void sendSongFile(File songFile) {
-		audioThread.sendSongFile(songFile);
-	}
-	
-	public void setCommandThreadReceivedListener(CommandReceivedListener listener) {
-		commandThread.setCommandReceivedListener(listener);
 	}
 
 }

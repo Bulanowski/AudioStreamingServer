@@ -28,6 +28,7 @@ public class SongQueue implements Runnable {
 		if (thread == null) {
 			System.out.println("Starting Song Queue!");
 			thread = new Thread(this);
+			thread.setName("Song-Queue");
 			thread.start();
 		}
 	}

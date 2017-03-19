@@ -63,12 +63,6 @@ public class CommandController implements CommandReceivedListener {
 				c.stopPlaying();
 			}
 			break;
-		case "end_connection":
-			if (ev.getSource() instanceof Client) {
-				Client c = (Client) ev.getSource();
-				c.stop();
-			}
-			break;
 		default:
 			System.out.println("Invalid input command received: " + command);
 			break;

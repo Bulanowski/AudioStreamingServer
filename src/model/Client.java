@@ -6,6 +6,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class Client implements Runnable {
 	private Thread thread;
@@ -29,18 +30,19 @@ public class Client implements Runnable {
 	public void start() {
 		if (thread == null) {
 			thread = new Thread(this);
+			thread.setName("Client-" + name);
 			thread.start();
 		}
 	}
-	
+
 	public boolean getPlaying() {
 		return playing;
 	}
-	
+
 	public void startPlaying() {
 		playing = true;
 	}
-	
+
 	public void stopPlaying() {
 		playing = false;
 	}
@@ -59,6 +61,8 @@ public class Client implements Runnable {
 				if (commandReceivedListener != null) {
 					commandReceivedListener.commandReceived(ev);
 				}
+			} catch (SocketException e) {
+				System.err.println(e.getMessage());
 			} catch (EOFException e) {
 				try {
 					socket.close();
@@ -67,12 +71,6 @@ public class Client implements Runnable {
 					e1.printStackTrace();
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -94,10 +92,6 @@ public class Client implements Runnable {
 		output.writeByte(packageType);
 		output.writeObject(obj);
 	}
-
-//	public void setCommandReceivedListener(CommandReceivedListener commandReceivedListener) {
-//		this.commandReceivedListener = commandReceivedListener;
-//	}
 
 	public boolean isConnected() {
 		return socket.isConnected();

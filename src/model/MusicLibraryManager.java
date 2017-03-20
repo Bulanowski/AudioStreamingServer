@@ -57,7 +57,7 @@ public class MusicLibraryManager {
 					}
 					s.close();
 				}
-				ml.addSong(new Song(songName, artistName, albumName, file.getAbsolutePath(), trackNumber));
+				ml.addSong(new Song(file.getAbsolutePath(), songName, albumName, artistName, trackNumber));
 
 			} catch (CannotReadException | IOException | TagException | ReadOnlyFileException
 					| InvalidAudioFrameException e) {

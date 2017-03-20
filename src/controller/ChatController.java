@@ -15,8 +15,8 @@ public class ChatController {
 	}
 	
 	public void sendChat(String msg, Client c) {
-		Date date = new Date();
-		String fullMsg = "["+date.toString()+"] "+c.getName() +": "+msg;
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss aa");
+		String fullMsg = "[" + dateFormat.format(new Date()) + "] " + c.getName() + ": " + msg;
 		try {
 			clientList.sendAll(PackageType.CHAT.getByte(), fullMsg);
 		} catch (IOException e) {

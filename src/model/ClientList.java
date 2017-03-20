@@ -14,25 +14,14 @@ public class ClientList {
 		clients = new HashMap<>();
 	}
 	
-//	public void sendAllCatchAll(byte packageType, Object information) {
-//		System.out.println("Sending data to connected clients: " + information);
-//		for (Client c : clients.values()) {
-//			if (c.isConnected()) {
-//				System.out.println(
-//						"Sending to client " + c.getInetAddress().getHostAddress() + " at time " + System.nanoTime());
-//				c.sendCatchAll(packageType, information);;
-//			} else {
-//				c.stop();
-//				clients.remove(c.getInetAddress());
-//			}
-//		}
-//	}
-
-	// GET RID OF THESE THROWS
-	public void sendAll(byte packageType, Object obj) throws IOException {
+	public void sendAll(byte packageType, Object obj) {
 		for (Client c : clients.values()) {
 			if (c.isConnected()) {
-				c.send(packageType, obj);
+				try {
+					c.send(packageType, obj);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			} else {
 				c.stop();
 				clients.remove(c.getInetAddress());

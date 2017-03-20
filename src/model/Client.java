@@ -14,8 +14,9 @@ public class Client implements Runnable {
 	private final ObjectOutputStream output;
 	private final ObjectInputStream input;
 	private final CommandReceivedListener commandReceivedListener;
-	private String name;
+	private final String hostAddress;
 	private final int id;
+	private String username;
 	private volatile boolean playing = false;
 
 	public Client(Socket socket, CommandReceivedListener commandReceivedListener) throws IOException {
@@ -23,14 +24,14 @@ public class Client implements Runnable {
 		this.commandReceivedListener = commandReceivedListener;
 		output = new ObjectOutputStream(socket.getOutputStream());
 		input = new ObjectInputStream(socket.getInputStream());
-//		name = socket.getInetAddress().getHostAddress();
+		hostAddress = socket.getInetAddress().getHostAddress();
 		id = socket.getPort();
 	}
 
 	public void start() {
 		if (thread == null) {
 			thread = new Thread(this);
-			thread.setName("Client-" + name);
+			thread.setName("Client-" + hostAddress);
 			thread.start();
 		}
 	}
@@ -76,9 +77,14 @@ public class Client implements Runnable {
 		}
 	}
 
+	public synchronized void send(byte packageType, Object obj) throws IOException {
+		output.writeByte(packageType);
+		output.writeObject(obj);
+	}
+
 	public void stop() {
 		try {
-			System.out.println("Closing connection with " + socket.getInetAddress().getHostAddress());
+			System.out.println("Closing connection with " + hostAddress);
 			if (socket != null) {
 				socket.close();
 			}
@@ -86,11 +92,6 @@ public class Client implements Runnable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public synchronized void send(byte packageType, Object obj) throws IOException {
-		output.writeByte(packageType);
-		output.writeObject(obj);
 	}
 
 	public boolean isConnected() {
@@ -102,11 +103,11 @@ public class Client implements Runnable {
 	}
 
 	public String getName() {
-		return name;
+		return username;
 	}
 	
 	public void setName(String s) {
-		name = s;
+		username = s;
 	}
 
 	public int getId() {

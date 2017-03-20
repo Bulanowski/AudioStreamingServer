@@ -14,7 +14,7 @@ public class Client implements Runnable {
 	private final ObjectOutputStream output;
 	private final ObjectInputStream input;
 	private final CommandReceivedListener commandReceivedListener;
-	private final String name;
+	private String name;
 	private final int id;
 	private volatile boolean playing = false;
 
@@ -23,7 +23,7 @@ public class Client implements Runnable {
 		this.commandReceivedListener = commandReceivedListener;
 		output = new ObjectOutputStream(socket.getOutputStream());
 		input = new ObjectInputStream(socket.getInputStream());
-		name = socket.getInetAddress().getHostAddress();
+//		name = socket.getInetAddress().getHostAddress();
 		id = socket.getPort();
 	}
 
@@ -103,6 +103,10 @@ public class Client implements Runnable {
 
 	public String getName() {
 		return name;
+	}
+	
+	public void setName(String s) {
+		name = s;
 	}
 
 	public int getId() {

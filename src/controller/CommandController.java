@@ -13,10 +13,12 @@ public class CommandController implements CommandReceivedListener {
 
 	private MusicLibraryManager manager;
 	private SongQueue queue;
+	private ChatController chat;
 
-	public CommandController(MusicLibraryManager manager, SongQueue queue) {
+	public CommandController(MusicLibraryManager manager, SongQueue queue, ChatController chat) {
 		this.manager = manager;
 		this.queue = queue;
+		this.chat = chat;
 	}
 
 	@Override
@@ -43,24 +45,21 @@ public class CommandController implements CommandReceivedListener {
 			queue.addSong(command.substring(command.indexOf(' ') + 1));
 			break;
 		case "chat":
-			// System.out.println(inputCommand);
-
-			// String msg = input.substring(5);
-
-			// for (User user : users) {
-			// connectionSocket = new
-			// Socket(user.getIpAddress(), 6789);
-			// welcomeSocket.close();
-			// connectionSocket = new Socket("71.190.190.19", 6790);
-			// outToClient = new
-			// ObjectOutputStream(connectionSocket.getOutputStream());
-			// outToClient.writeObject(msg);
-			// }
+			if (ev.getSource() instanceof Client) {
+				Client c = (Client) ev.getSource();
+				chat.sendChat(command.substring(command.indexOf(' ') + 1), c);
+			}
 			break;
 		case "song_end":
 			if (ev.getSource() instanceof Client) {
 				Client c = (Client) ev.getSource();
 				c.stopPlaying();
+			}
+			break;
+		case "username":
+			if (ev.getSource() instanceof Client) {
+				Client c = (Client) ev.getSource();
+				c.setName(command.substring(command.indexOf(' ') + 1));
 			}
 			break;
 		default:

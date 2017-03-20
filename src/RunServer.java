@@ -1,4 +1,5 @@
 
+import controller.ChatController;
 import controller.CommandController;
 import model.ClientList;
 import model.CommandReceivedListener;
@@ -21,7 +22,8 @@ public class RunServer {
 
 		ClientList clientList = new ClientList();
 		SongQueue songQueue = new SongQueue(clientList);
-		CommandReceivedListener commandReceivedListener = new CommandController(manager, songQueue);
+		ChatController chat = new ChatController(clientList);
+		CommandReceivedListener commandReceivedListener = new CommandController(manager, songQueue, chat);
 		// CommandServer commandServer = new CommandServer(listener);
 		// AudioServer audioServer = new AudioServer();
 		songQueue.start();

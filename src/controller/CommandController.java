@@ -43,8 +43,13 @@ public class CommandController implements CommandReceivedListener {
 			System.out.println("song request");
 			break;
 		case "add_to_queue":
-			int id = Integer.parseInt( command.substring(command.indexOf(' ') + 1));
+			Integer id;
+			id = Integer.getInteger( command.substring(command.indexOf(' ') + 1));
+			if(id != null) {
 			queue.addSong(id);
+			} else {
+				System.err.println("add_to_queue command was used incorrectly: "+ command.substring(command.indexOf(' ') + 1));
+			}
 			break;
 		case "chat":
 			if (ev.getSource() instanceof Client) {

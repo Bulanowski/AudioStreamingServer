@@ -7,14 +7,17 @@ public class SongQueue implements Runnable {
 	private SendFileListener sendFileListener;
 	private final ClientList clientList;
 	private final ConcurrentLinkedQueue<String> songPaths;
+	private final MusicLibraryManager manager;
 	private volatile int size = 0;
 
-	public SongQueue(ClientList clientList) {
+	public SongQueue(ClientList clientList, MusicLibraryManager manager) {
 		this.clientList = clientList;
+		this.manager = manager;
 		songPaths = new ConcurrentLinkedQueue<>();
 	}
 
-	public synchronized void addSong(String song) {
+	public synchronized void addSong(int id) {
+		String song = manager.listSong().get(id).getPath();
 		songPaths.offer(song);
 		size++;
 		System.out.println("Added song to queue: " + song);

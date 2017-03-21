@@ -29,6 +29,15 @@ public class MusicLibraryManager {
 		return ml.getSongList();
 	}
 
+	public ArrayList<Song> listSongNoPath() {
+		ArrayList<Song> tempList = new ArrayList<>();
+		for(Song song : ml.songs) {
+			Song tempSong = new Song(null, song.getName(), song.getAlbum(), song.getArtist(), song.getTrackNumber());
+			tempList.add(tempSong);
+		}
+		return tempList;
+	}
+
 	public void openMusicLibrary() {
 		ml = getMusicLibrary();
 	}

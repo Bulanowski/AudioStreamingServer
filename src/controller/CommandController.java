@@ -32,7 +32,8 @@ public class CommandController implements CommandReceivedListener {
 			if (ev.getSource() instanceof Client) {
 				Client c = (Client) ev.getSource();
 				try {
-					c.send(PackageType.SONG_LIST.getByte(), manager.listSong());
+
+					c.send(PackageType.SONG_LIST.getByte(), manager.listSongNoPath());
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -42,7 +43,8 @@ public class CommandController implements CommandReceivedListener {
 			System.out.println("song request");
 			break;
 		case "add_to_queue":
-			queue.addSong(command.substring(command.indexOf(' ') + 1));
+			int id = Integer.parseInt( command.substring(command.indexOf(' ') + 1));
+			queue.addSong(id);
 			break;
 		case "chat":
 			if (ev.getSource() instanceof Client) {

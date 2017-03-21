@@ -21,7 +21,7 @@ public class RunServer {
 		}
 
 		ClientList clientList = new ClientList();
-		SongQueue songQueue = new SongQueue(clientList);
+		SongQueue songQueue = new SongQueue(clientList,manager);
 		ChatController chat = new ChatController(clientList);
 		CommandReceivedListener commandReceivedListener = new CommandController(manager, songQueue, chat);
 		// CommandServer commandServer = new CommandServer(listener);

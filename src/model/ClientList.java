@@ -16,13 +16,15 @@ public class ClientList {
 	
 	public void sendAll(byte packageType, Object obj) {
 		for (Client c : clients.values()) {
-			if (c.isConnected()) {
-				try {
+			try {
+				if (c.isConnected()) {
 					c.send(packageType, obj);
-				} catch (IOException e) {
-					e.printStackTrace();
+				} else {
+					c.stop();
+					clients.remove(c.getInetAddress());
 				}
-			} else {
+			} catch (IOException e) {
+				e.printStackTrace();
 				c.stop();
 				clients.remove(c.getInetAddress());
 			}

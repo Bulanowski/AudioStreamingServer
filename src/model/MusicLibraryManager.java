@@ -32,7 +32,11 @@ public class MusicLibraryManager {
 	public ArrayList<Song> listSongNoPath() {
 		ArrayList<Song> tempList = new ArrayList<>();
 		for(Song song : ml.songs) {
-			Song tempSong = new Song(null, song.getName(), song.getAlbum(), song.getArtist(), song.getTrackNumber());
+			Song tempSong = new Song(null, song.getTrackNumber());
+			tempSong.setName(song.getName());
+			tempSong.setArtist(song.getArtist());
+			tempSong.setAlbum(song.getAlbum());
+			tempSong.setID(song.getID());
 			tempList.add(tempSong);
 		}
 		return tempList;
@@ -66,7 +70,11 @@ public class MusicLibraryManager {
 					}
 					s.close();
 				}
-				ml.addSong(new Song(file.getAbsolutePath(), songName, albumName, artistName, trackNumber));
+				Song song = new Song(file.getAbsolutePath(), trackNumber);
+				song.setName(songName);
+				song.setArtist(artistName);
+				song.setAlbum(albumName);
+				ml.addSong(song);
 
 			} catch (CannotReadException | IOException | TagException | ReadOnlyFileException
 					| InvalidAudioFrameException e) {
@@ -149,7 +157,12 @@ public class MusicLibraryManager {
 				} catch (NumberFormatException e) {
 					System.err.println(e.getMessage());
 				}
-				ml.addSong(new Song(file.getAbsolutePath(), songName, albumName, artistName, trackNumber));
+				Song song = new Song(file.getAbsolutePath(), trackNumber);
+				song.setName(songName);
+				song.setArtist(artistName);
+				song.setAlbum(albumName);
+				song.setTrackNumber(trackNumber);
+				ml.addSong(song);
 
 			} catch (CannotReadException | IOException | TagException | ReadOnlyFileException
 					| InvalidAudioFrameException e) {

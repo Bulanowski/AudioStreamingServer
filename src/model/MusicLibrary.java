@@ -7,13 +7,16 @@ public class MusicLibrary implements Serializable {
 
 	private static final long serialVersionUID = -4059770274326642864L;
 	ArrayList<Song> songs;
+	private int lastID;
 
 	public MusicLibrary() {
 		songs = new ArrayList<>();
+		lastID = 0;
 	}
 
-	public void addSong(Song a) {
-		songs.add(a);
+	public void addSong(Song song) {
+		song.setID(lastID++);
+		songs.add(song);
 	}
 
 	public ArrayList<Song> getSongList() {

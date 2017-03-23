@@ -13,12 +13,12 @@ public class RunServer {
 	public static void main(String[] args) {
 
 		MusicLibraryManager manager = new MusicLibraryManager();
-		manager.openMusicLibrary();
 		if (args.length > 0) {
 			if (args[0].equals("reread")) {
 				manager.rereadWholeLibrary();
 			}
 		}
+		manager.openMusicLibrary();
 
 		ClientList clientList = new ClientList();
 		SongQueue songQueue = new SongQueue(clientList,manager);

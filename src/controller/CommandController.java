@@ -44,7 +44,7 @@ public class CommandController implements CommandReceivedListener {
 			break;
 		case "add_to_queue":
 			Integer id;
-			id = Integer.getInteger( command.substring(command.indexOf(' ') + 1));
+			id = Integer.valueOf(command.substring(command.indexOf(' ') + 1));
 			if(id != null) {
 			queue.addSong(id);
 			} else {

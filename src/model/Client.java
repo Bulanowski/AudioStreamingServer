@@ -30,8 +30,7 @@ public class Client implements Runnable {
 
 	public void start() {
 		if (thread == null) {
-			thread = new Thread(this);
-			thread.setName("Client-" + hostAddress);
+			thread = new Thread(this, "Client-" + hostAddress);
 			thread.start();
 		}
 	}
@@ -105,9 +104,16 @@ public class Client implements Runnable {
 	public String getName() {
 		return username;
 	}
-	
-	public void setName(String s) {
-		username = s;
+
+	public void setName(String newUsername) {
+		if (username != null) {
+			System.out.println(hostAddress + " changed username from " + username + " to " + newUsername);
+			username = newUsername;
+		} else {
+			System.out.println(hostAddress + " set username to " + newUsername);
+			username = newUsername;
+		}
+		
 	}
 
 	public int getId() {

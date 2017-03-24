@@ -13,7 +13,7 @@ public class ClientList {
 	public ClientList() {
 		clients = new HashMap<>();
 	}
-	
+
 	public void sendAll(byte packageType, Object obj) {
 		for (Client c : clients.values()) {
 			try {
@@ -21,7 +21,6 @@ public class ClientList {
 					c.send(packageType, obj);
 				} else {
 					c.stop();
-					clients.remove(c.getInetAddress());
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -30,16 +29,18 @@ public class ClientList {
 			}
 		}
 	}
-	
+
 	public void startPlaying() {
 		for (Client c : clients.values()) {
-			c.startPlaying();
+			if (c.isConnected()) {
+				c.startPlaying();
+			}
 		}
 	}
-	
-	public boolean isPlaying() {
+
+	public boolean isAnyonePlaying() {
 		for (Client c : clients.values()) {
-			if (c.getPlaying()) {
+			if (c.isConnected() && c.getPlaying()) {
 				return true;
 			}
 		}
@@ -61,7 +62,6 @@ public class ClientList {
 	public void addClient(Socket clientSocket, CommandReceivedListener commandReceivedListener) {
 		try {
 			Client client = new Client(clientSocket, commandReceivedListener);
-//			client.setCommandReceivedListener(commandReceivedListener);
 			client.start();
 			clients.put(client.getInetAddress(), client);
 		} catch (IOException e) {

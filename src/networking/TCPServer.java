@@ -21,14 +21,14 @@ public class TCPServer implements Runnable {
 
 	public void start() {
 		if (thread == null) {
-			thread = new Thread(this);
+			thread = new Thread(this,"TCPServer");
 			thread.start();
+			System.out.println("Starting TCP Server!");
 		}
 	}
 
 	@Override
 	public void run() {
-		System.out.println("Starting TCP Server!");
 		ServerSocket welcomeSocket = null;
 		try {
 			welcomeSocket = new ServerSocket(port);

@@ -4,34 +4,32 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class SongQueue implements Runnable {
 	private Thread thread;
-	private SendFileListener sendFileListener;
+	private SendSongListener sendFileListener;
 	private final ClientList clientList;
-	private final ConcurrentLinkedQueue<String> songPaths;
+	private final ConcurrentLinkedQueue<Integer> songIDs;
 	private final MusicLibraryManager manager;
 	private volatile int size = 0;
 
 	public SongQueue(ClientList clientList, MusicLibraryManager manager) {
 		this.clientList = clientList;
 		this.manager = manager;
-		songPaths = new ConcurrentLinkedQueue<>();
+		songIDs = new ConcurrentLinkedQueue<>();
 	}
 
 	public synchronized void addSong(int id) {
-		String song = manager.listSong().get(id).getPath();
-		songPaths.offer(song);
+		songIDs.offer(id);
 		size++;
-		System.out.println("Added song to queue: " + song);
+		System.out.println("Added song to queue: " + id);
 	}
 
-	public void setSendFileListener(SendFileListener sendFileListner) {
+	public void setSendFileListener(SendSongListener sendFileListner) {
 		this.sendFileListener = sendFileListner;
 	}
 
 	public void start() {
 		if (thread == null) {
 			System.out.println("Starting Song Queue!");
-			thread = new Thread(this);
-			thread.setName("Song-Queue");
+			thread = new Thread(this,"Song-Queue");
 			thread.start();
 		}
 	}
@@ -43,10 +41,11 @@ public class SongQueue implements Runnable {
 	@Override
 	public void run() {
 		while (thread != null) {
-			if (!clientList.isPlaying() && size > 0) {
+			if (!clientList.isAnyonePlaying() && size > 0) {
 				size--;
-				String songPath = songPaths.poll();
-				SendFileEvent ev = new SendFileEvent(this, songPath);
+				int id = songIDs.poll();
+				
+				SendSongEvent ev = new SendSongEvent(this, manager.listSong().get(id));
 				if (sendFileListener != null) {
 					sendFileListener.fileReady(ev);
 				}

@@ -59,11 +59,11 @@ public class AudioBroadcaster implements Runnable {
 					FileInputStream fileInStream = new FileInputStream(songFile);
 					Integer size = fileInStream.available() + PACKET_SIZE;
 					System.out.println(size);
-					clientList.sendAll(PackageType.SONG_INFO.getByte(), new Pair<Integer, Song>(size, song));
+					clientList.sendAll(PackageType.SONG.getByte(), new Pair<Integer, Song>(size, song));
 					while (fileInStream.available() != 0) {
 						byte[] buffer = new byte[PACKET_SIZE];
 						fileInStream.read(buffer);
-						clientList.sendAll(PackageType.AUDIO.getByte(), buffer);
+						clientList.sendAll(PackageType.SONG.getByte(), buffer);
 					}
 					System.out.println("Finished sending.");
 					fileInStream.close();

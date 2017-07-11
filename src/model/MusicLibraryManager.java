@@ -78,7 +78,6 @@ public class MusicLibraryManager {
 
 			} catch (CannotReadException | IOException | TagException | ReadOnlyFileException
 					| InvalidAudioFrameException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -94,10 +93,8 @@ public class MusicLibraryManager {
 			oos.writeObject(ml);
 			oos.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -110,13 +107,10 @@ public class MusicLibraryManager {
 			ml = (MusicLibrary) ois.readObject();
 			ois.close();
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return ml;
@@ -166,7 +160,6 @@ public class MusicLibraryManager {
 
 			} catch (CannotReadException | IOException | TagException | ReadOnlyFileException
 					| InvalidAudioFrameException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} // End of for loop
@@ -177,10 +170,8 @@ public class MusicLibraryManager {
 			oos.close();
 			System.out.println("Done rereading Library!");
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

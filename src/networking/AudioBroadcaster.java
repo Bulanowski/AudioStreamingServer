@@ -23,20 +23,17 @@ public class AudioBroadcaster implements Runnable {
 
 	public AudioBroadcaster(ClientList clientList) {
 		this.clientList = clientList;
-		sendFileListener = new SendSongListener() {
+		sendFileListener = ev -> {
+            if (songFile == null) {
 
-			@Override
-			public void fileReady(SendSongEvent ev) {
-				if (songFile == null) {
-					songFile = new File(ev.getSong().getPath());
-					song = ev.getSong();
-					clientList.startPlaying();
-				} else {
-					System.err.println("Tried to change songFile in AudioBroadcaster from " + songFile.getAbsolutePath()
-							+ " to " + new File(ev.getSong().getPath()));
-				}
-			}
-		};
+                songFile = new File(ev.getSong().getPath());
+                song = ev.getSong();
+                clientList.startPlaying();
+            } else {
+                System.err.println("Tried to change songFile in AudioBroadcaster from " + songFile.getAbsolutePath()
+                        + " to " + new File(ev.getSong().getPath()));
+            }
+        };
 	}
 
 	public void start() {
@@ -59,7 +56,7 @@ public class AudioBroadcaster implements Runnable {
 					FileInputStream fileInStream = new FileInputStream(songFile);
 					Integer size = fileInStream.available() + PACKET_SIZE;
 					System.out.println(size);
-					clientList.sendAll(PackageType.SONG.getByte(), new Pair<Integer, Song>(size, song));
+					clientList.sendAll(PackageType.SONG.getByte(), new Pair<>(size, song));
 					while (fileInStream.available() != 0) {
 						byte[] buffer = new byte[PACKET_SIZE];
 						fileInStream.read(buffer);

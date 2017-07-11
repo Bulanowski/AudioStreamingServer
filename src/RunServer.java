@@ -6,6 +6,7 @@ import model.CommandReceivedListener;
 import model.MusicLibraryManager;
 import model.SongQueue;
 import networking.AudioBroadcaster;
+import networking.ClientQueueUpdater;
 import networking.TCPServer;
 
 public class RunServer {
@@ -30,7 +31,11 @@ public class RunServer {
 		// songQueue.setSendFileListener(clientList.getSendFileListener());
 		AudioBroadcaster audioBroadcaster = new AudioBroadcaster(clientList);
 		audioBroadcaster.start();
+		ClientQueueUpdater queueUpdater = new ClientQueueUpdater(clientList);
+		queueUpdater.start();
+		queueUpdater.setSongQueue(songQueue.getSongQueue());
 		songQueue.setSendFileListener(audioBroadcaster.getSendFileListener());
+		songQueue.addSongQueueListener(queueUpdater.getListener());
 		TCPServer tcpServer = new TCPServer(53308, clientList, commandReceivedListener);
 		tcpServer.start();
 		// commandServer.setClientList(clientList);
@@ -38,8 +43,6 @@ public class RunServer {
 		// commandServer.start();
 		// audioServer.start();
 
-		// TeamspeakQuery query = new TeamspeakQuery();
-		// query.start();
 
 	}
 

@@ -1,29 +1,65 @@
 package model;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ChangeListener;
+
+import java.util.*;
 
 public class SongQueue implements Runnable {
 	private Thread thread;
 	private SendSongListener sendFileListener;
 	private final ClientList clientList;
-	private final ConcurrentLinkedQueue<Integer> songIDs;
+	private final LinkedHashMap<Integer, Song> songs;
 	private final MusicLibraryManager manager;
-	private volatile int size = 0;
+	private int key = 0;
+	private volatile SimpleIntegerProperty size = new SimpleIntegerProperty(0);
 
 	public SongQueue(ClientList clientList, MusicLibraryManager manager) {
 		this.clientList = clientList;
 		this.manager = manager;
-		songIDs = new ConcurrentLinkedQueue<>();
+		songs = new LinkedHashMap<>();
 	}
+
+	public void addSongQueueListener(ChangeListener listener) {
+	    size.addListener(listener);
+    }
+
+	public LinkedHashMap<Integer, Song> getSongQueue() {
+		return songs;
+	}
+
 
 	public synchronized void addSong(int id) {
-		songIDs.offer(id);
-		size++;
-		System.out.println("Added song to queue: " + id);
+		key = key < 100000 ? key + 1 : 0;
+		songs.put(key,manager.listSong().get(id));
+		size.set(size.add(1).get());
+        System.out.println("Added song to queue: " + id);
+    }
+
+	public synchronized Song removeFirst() {
+		Iterator iterator = songs.entrySet().iterator();
+		Map.Entry entry = (Map.Entry) iterator.next();
+		iterator.remove();
+
+
+		return (Song) entry.getValue();
 	}
 
-	public void setSendFileListener(SendSongListener sendFileListner) {
-		this.sendFileListener = sendFileListner;
+	public synchronized void removeSong(int id) {
+		Iterator iterator = songs.entrySet().iterator();
+		while (iterator.hasNext()) {
+			Map.Entry entry = (Map.Entry) iterator.next();
+			if(((int) entry.getKey()) == id) {
+				iterator.remove();
+			}
+		}
+
+		size.set(size.subtract(1).get());
+
+	}
+
+	public void setSendFileListener(SendSongListener sendFileListener) {
+		this.sendFileListener = sendFileListener;
 	}
 
 	public void start() {
@@ -41,11 +77,11 @@ public class SongQueue implements Runnable {
 	@Override
 	public void run() {
 		while (thread != null) {
-			if (!clientList.isAnyonePlaying() && size > 0) {
-				size--;
-				int id = songIDs.poll();
-				
-				SendSongEvent ev = new SendSongEvent(this, manager.listSong().get(id));
+			if (!clientList.isAnyonePlaying() && size.getValue() > 0) {
+				Song song = removeFirst();
+				size.set(size.subtract(1).get());
+
+				SendSongEvent ev = new SendSongEvent(this, song);
 				if (sendFileListener != null) {
 					sendFileListener.fileReady(ev);
 				}

@@ -37,6 +37,7 @@ public class MusicLibraryManager {
 			tempSong.setArtist(song.getArtist());
 			tempSong.setAlbum(song.getAlbum());
 			tempSong.setID(song.getID());
+			tempSong.setTrackLength(song.getTrackLength());
 			tempList.add(tempSong);
 		}
 		return tempList;
@@ -140,6 +141,7 @@ public class MusicLibraryManager {
 		for (File file : list) {
 			try {
 				AudioFile af = AudioFileIO.read(file);
+				int trackLength = af.getAudioHeader().getTrackLength();
 				Tag t = af.getTag();
 				String artistName = t.getFirst(FieldKey.ARTIST);
 				String albumName = t.getFirst(FieldKey.ALBUM);
@@ -152,6 +154,7 @@ public class MusicLibraryManager {
 					System.err.println(e.getMessage());
 				}
 				Song song = new Song(file.getAbsolutePath(), trackNumber);
+				song.setTrackLength(trackLength);
 				song.setName(songName);
 				song.setArtist(artistName);
 				song.setAlbum(albumName);

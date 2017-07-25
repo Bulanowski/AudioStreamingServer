@@ -13,6 +13,7 @@ public class Song implements Serializable, Comparable<Song>, Comparator<Song> {
 	private String artist;
 	private int trackNumber;
 	private int id;
+	private int trackLength;
 
 	public Song(String path, int trackNumber) {
 		this.path = path;
@@ -62,6 +63,11 @@ public class Song implements Serializable, Comparable<Song>, Comparator<Song> {
 	public void setTrackNumber(int trackNumber) {
 		this.trackNumber = trackNumber;
 	}
+
+	public int getTrackLength() {return trackLength; }
+
+	public void setTrackLength(int trackLength) {this.trackLength = trackLength;}
+
 
 	@Override
 	public int compareTo(Song s) {

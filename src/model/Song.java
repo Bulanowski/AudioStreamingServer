@@ -79,4 +79,13 @@ public class Song implements Serializable, Comparable<Song>, Comparator<Song> {
 		return s1.getTrackNumber() - s2.getTrackNumber();
 	}
 
+	@Override
+	public String toString() {
+		return "Song{" +
+				"name='" + name + '\'' +
+				", album='" + album + '\'' +
+				", artist='" + artist + '\'' +
+				", id=" + id +
+				'}';
+	}
 }

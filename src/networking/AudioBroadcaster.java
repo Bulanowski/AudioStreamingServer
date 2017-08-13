@@ -4,36 +4,35 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javafx.util.Pair;
-import model.ClientList;
-import model.PackageType;
-import model.SendSongEvent;
-import model.SendSongListener;
-import model.Song;
+import model.*;
 
 public class AudioBroadcaster implements Runnable {
 
 	private Thread thread;
 	private final ClientList clientList;
-	private final SendSongListener sendFileListener;
 	private volatile File songFile;
 	private volatile Song song;
+	private final GlobalValues globalValues;
 	private final int PACKET_SIZE = 32;
 
-	public AudioBroadcaster(ClientList clientList) {
+	public AudioBroadcaster(ClientList clientList, GlobalValues globalValues) {
 		this.clientList = clientList;
-		sendFileListener = ev -> {
-            if (songFile == null) {
-
-                songFile = new File(ev.getSong().getPath());
-                song = ev.getSong();
-                clientList.startPlaying();
-            } else {
-                System.err.println("Tried to change songFile in AudioBroadcaster from " + songFile.getAbsolutePath()
-                        + " to " + new File(ev.getSong().getPath()));
-            }
-        };
+		this.globalValues = globalValues;
+		globalValues.addValueChangedListener(GlobalValueType.SONG_TO_PLAY, (observable, oldValue, newValue) -> {
+			Song newSong = (Song) newValue;
+			if (songFile == null) {
+				songFile = new File(newSong.getPath());
+				song = newSong;
+				clientList.startPlaying();
+			} else {
+				System.err.println("Tried to change songFile in AudioBroadcaster from " + songFile.getAbsolutePath()
+						+ " to " + new File(newSong.getPath()));
+			}
+        });
 	}
 
 	public void start() {
@@ -44,10 +43,6 @@ public class AudioBroadcaster implements Runnable {
 		}
 	}
 
-	public SendSongListener getSendFileListener() {
-		return sendFileListener;
-	}
-
 	@Override
 	public void run() {
 		while (thread != null) {
@@ -55,14 +50,13 @@ public class AudioBroadcaster implements Runnable {
 				try {
 					FileInputStream fileInStream = new FileInputStream(songFile);
 					Integer size = fileInStream.available() + PACKET_SIZE;
-					System.out.println(size);
-					clientList.sendAll(PackageType.SONG.getByte(), new Pair<>(size, song));
-					while (fileInStream.available() != 0) {
+					clientList.sendAll(PackageType.SONG, new Pair<>(size, song));
+					while (fileInStream.available() != 0 && !(Boolean) globalValues.getValue(GlobalValueType.SKIP_SONG, false)) {
 						byte[] buffer = new byte[PACKET_SIZE];
 						fileInStream.read(buffer);
-						clientList.sendAll(PackageType.SONG.getByte(), buffer);
+						clientList.sendAll(PackageType.SONG, buffer);
 					}
-					System.out.println("Finished sending.");
+					Logger.getGlobal().log(Level.INFO, "Finished sending");
 					fileInStream.close();
 				} catch (FileNotFoundException e) {
 					e.printStackTrace();

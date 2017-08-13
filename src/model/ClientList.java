@@ -14,7 +14,7 @@ public class ClientList {
 		clients = new HashMap<>();
 	}
 
-	public void sendAll(byte packageType, Object obj) {
+	public void sendAll(PackageType packageType, Object obj) {
 		for (Client c : clients.values()) {
 			try {
 				if (c.isConnected()) {

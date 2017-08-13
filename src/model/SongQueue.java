@@ -1,65 +1,74 @@
 package model;
 
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.value.ChangeListener;
+import javafx.util.Pair;
+import networking.ClientQueueUpdater;
 
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SongQueue implements Runnable {
 	private Thread thread;
-	private SendSongListener sendFileListener;
+	private ClientQueueUpdater clientQueueUpdater;
 	private final ClientList clientList;
-	private final LinkedHashMap<Integer, Song> songs;
 	private final MusicLibraryManager manager;
+	private final GlobalValues globalValues;
+	private final LinkedHashMap<Integer, QueuedSong> songs; // Integer is key, should be unique ID
 	private int key = 0;
-	private volatile SimpleIntegerProperty size = new SimpleIntegerProperty(0);
 
-	public SongQueue(ClientList clientList, MusicLibraryManager manager) {
+	public SongQueue(ClientList clientList, MusicLibraryManager manager, GlobalValues globalValues) {
 		this.clientList = clientList;
 		this.manager = manager;
+		this.globalValues = globalValues;
 		songs = new LinkedHashMap<>();
 	}
 
-	public void addSongQueueListener(ChangeListener listener) {
-	    size.addListener(listener);
-    }
-
-	public LinkedHashMap<Integer, Song> getSongQueue() {
+	public LinkedHashMap<Integer, QueuedSong> getSongQueue() {
 		return songs;
 	}
 
-
-	public synchronized void addSong(int id) {
-		key = key < 100000 ? key + 1 : 0;
-		songs.put(key,manager.listSong().get(id));
-		size.set(size.add(1).get());
-        System.out.println("Added song to queue: " + id);
-    }
-
-	public synchronized Song removeFirst() {
+	public List<Pair<Integer, Song>> getSerializableQueue() {
 		Iterator iterator = songs.entrySet().iterator();
-		Map.Entry entry = (Map.Entry) iterator.next();
-		iterator.remove();
-
-
-		return (Song) entry.getValue();
-	}
-
-	public synchronized void removeSong(int id) {
-		Iterator iterator = songs.entrySet().iterator();
+		ArrayList<Pair<Integer,Song>> temp = new ArrayList<>();
 		while (iterator.hasNext()) {
 			Map.Entry entry = (Map.Entry) iterator.next();
-			if(((int) entry.getKey()) == id) {
-				iterator.remove();
-			}
+			Integer thisKey = (Integer) entry.getKey();
+			Song thisSong = ((QueuedSong)entry.getValue()).getSong();
+			temp.add(new Pair<>(thisKey, thisSong));
 		}
-
-		size.set(size.subtract(1).get());
-
+		return temp;
 	}
 
-	public void setSendFileListener(SendSongListener sendFileListener) {
-		this.sendFileListener = sendFileListener;
+	public synchronized void addSong(Client client, int id) throws NullPointerException {
+		if (manager.listSong().get(id) == null) {
+			throw new NullPointerException("Tried to add to queue null song id " + id);
+		}
+		key = key < 100000 ? key + 1 : 0;
+		songs.put(key, new QueuedSong(client, manager.listSong().get(id)));
+		Logger.getGlobal().log(Level.INFO, "Adding song to queue: " + manager.listSong().get(id));
+        clientQueueUpdater.addQueueUpdate(true, key, manager.listSong().get(id));
+    }
+
+	public synchronized QueuedSong removeFirst() {
+		Iterator iterator = songs.entrySet().iterator();
+		Map.Entry entry = (Map.Entry) iterator.next();
+		removeSong((Integer) entry.getKey());
+		return (QueuedSong) entry.getValue();
+	}
+
+	public void voteToRemove(Client client, int key) {
+		if (songs.get(key).addRemoveVote() > ((double) clientList.clients().size()) / 2.0 || client.equals(songs.get(key).getClient())) {
+			removeSong(key);
+		}
+	}
+
+	private synchronized void removeSong(int key) {
+		Logger.getGlobal().log(Level.INFO, "Removing song from queue: " + songs.get(key).getSong());
+		clientQueueUpdater.addQueueUpdate(false, key, songs.remove(key).getSong());
+	}
+
+	public void setClientQueueUpdater(ClientQueueUpdater clientQueueUpdater) {
+		this.clientQueueUpdater = clientQueueUpdater;
 	}
 
 	public void start() {
@@ -77,17 +86,27 @@ public class SongQueue implements Runnable {
 	@Override
 	public void run() {
 		while (thread != null) {
-			if (!clientList.isAnyonePlaying() && size.getValue() > 0) {
-				Song song = removeFirst();
-				size.set(size.subtract(1).get());
-
-				SendSongEvent ev = new SendSongEvent(this, song);
-				if (sendFileListener != null) {
-					sendFileListener.fileReady(ev);
-				}
+			if (!clientList.isAnyonePlaying() && songs.size() > 0) {
+				Song song = removeFirst().getSong();
+				globalValues.setValue(GlobalValueType.SKIP_SONG, false);
+				globalValues.setValue(GlobalValueType.SONG_TO_PLAY, song);
 			} else {
+					int votes = 0;
+					for (Client c : clientList.clients()) {
+						if (c.getVoteToSkip()) {
+							votes++;
+						}
+					}
+					if (votes > ((double) clientList.clients().size()) / 2.0) {
+						Logger.getGlobal().log(Level.INFO, "Vote to skip passed");
+						globalValues.setValue(GlobalValueType.SKIP_SONG, true);
+						clientList.sendAll(PackageType.SONG, "stop");
+						for (Client c : clientList.clients()) {
+							c.stopPlaying();
+						}
+					}
 				try {
-					Thread.sleep(1);
+					Thread.sleep(100);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}

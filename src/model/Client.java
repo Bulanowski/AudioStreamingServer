@@ -18,6 +18,7 @@ public class Client implements Runnable {
 	private final int id;
 	private String username;
 	private volatile boolean playing = false;
+	private volatile boolean skip = false;
 
 	public Client(Socket socket, CommandReceivedListener commandReceivedListener) throws IOException {
 		this.socket = socket;
@@ -45,6 +46,15 @@ public class Client implements Runnable {
 
 	public void stopPlaying() {
 		playing = false;
+		skip = false;
+	}
+
+	public void voteToSkip() {
+		skip = true;
+	}
+
+	public boolean getVoteToSkip() {
+		return skip;
 	}
 
 	// TODO: Read input from Client
@@ -57,7 +67,7 @@ public class Client implements Runnable {
 		while (socket.isConnected()) {
 			try {
 				String inFromClient = input.readUTF();
-				CommandReceivedEvent ev = new CommandReceivedEvent(this, inFromClient);
+				CommandReceivedEvent ev = new CommandReceivedEvent(new Command(this, inFromClient));
 				if (commandReceivedListener != null) {
 					commandReceivedListener.commandReceived(ev);
 				}
@@ -75,8 +85,8 @@ public class Client implements Runnable {
 		}
 	}
 
-	public synchronized void send(byte packageType, Object obj) throws IOException {
-		output.writeByte(packageType);
+	public synchronized void send(PackageType packageType, Object obj) throws IOException {
+		output.writeByte(packageType.getByte());
 		output.writeObject(obj);
 	}
 

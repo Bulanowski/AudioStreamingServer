@@ -1,10 +1,8 @@
 
 import controller.ChatController;
 import controller.CommandController;
-import model.ClientList;
-import model.CommandReceivedListener;
-import model.MusicLibraryManager;
-import model.SongQueue;
+import controller.ConsoleInput;
+import model.*;
 import networking.AudioBroadcaster;
 import networking.ClientQueueUpdater;
 import networking.TCPServer;
@@ -21,29 +19,21 @@ public class RunServer {
 		}
 		manager.openMusicLibrary();
 
+		GlobalValues globalValues = new GlobalValues();
 		ClientList clientList = new ClientList();
-		SongQueue songQueue = new SongQueue(clientList,manager);
+		SongQueue songQueue = new SongQueue(clientList, manager, globalValues);
 		ChatController chat = new ChatController(clientList);
 		CommandReceivedListener commandReceivedListener = new CommandController(manager, songQueue, chat);
-		// CommandServer commandServer = new CommandServer(listener);
-		// AudioServer audioServer = new AudioServer();
 		songQueue.start();
-		// songQueue.setSendFileListener(clientList.getSendFileListener());
-		AudioBroadcaster audioBroadcaster = new AudioBroadcaster(clientList);
+		AudioBroadcaster audioBroadcaster = new AudioBroadcaster(clientList, globalValues);
 		audioBroadcaster.start();
 		ClientQueueUpdater queueUpdater = new ClientQueueUpdater(clientList);
 		queueUpdater.start();
-		queueUpdater.setSongQueue(songQueue.getSongQueue());
-		songQueue.setSendFileListener(audioBroadcaster.getSendFileListener());
-		songQueue.addSongQueueListener(queueUpdater.getListener());
+		songQueue.setClientQueueUpdater(queueUpdater);
 		TCPServer tcpServer = new TCPServer(53308, clientList, commandReceivedListener);
 		tcpServer.start();
-		// commandServer.setClientList(clientList);
-		// audioServer.setClientList(clientList);
-		// commandServer.start();
-		// audioServer.start();
-
-
+		ConsoleInput consoleInput = new ConsoleInput(commandReceivedListener);
+		consoleInput.start();
 	}
 
 }
